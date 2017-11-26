@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <algorithm>
-#include "deque.h"
+#include "../src/deque.h"
 #include <deque>
 #include <vector>
 #include <cmath>
