@@ -1,6 +1,10 @@
 #include <iterator>
+
 namespace mydeque {
-template <class T, int INC_COEF = 2, int DEC_COEF = 4> class Deque {
+
+template <class T, int INC_COEF = 2, int DEC_COEF = 4>
+
+class Deque {
 private:
   size_t capacity_;
   T *array_;
