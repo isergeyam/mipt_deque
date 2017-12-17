@@ -11,6 +11,7 @@ protected:
   std::deque<int> d_std;
   std::vector<int> array;
   static size_t test_max;
+
   static const int PU_BACK = 0;
   static const int PU_FRONT = 1;
   static const int PO_BACK = 2;
@@ -34,6 +35,15 @@ protected:
   }
 
 public:
+  static int samples_min;
+  static int samples_max;
+  static void init(int argc, char **argv) {
+    if (argc < 4)
+      return;
+    test_max = std::atoi(argv[1]);
+    samples_min = std::atoi(argv[2]);
+    samples_max = std::atoi(argv[3]);
+  }
   struct OperationData {
     int type;
     int data;
@@ -107,7 +117,6 @@ TEST_F(DequeTest, MAIN_FUNCTIONALITY) {
   deque_eq();
   std::sort(d_rand.begin(), d_rand.end());
   std::sort(d_std.begin(), d_std.end());
-  deque_eq();
 }
 TEST_F(DequeTest, Iterator) {
   EXPECT_TRUE(d0_.begin() == d0_.end());
@@ -136,11 +145,10 @@ TEST_F(DequeTest, ReverseIterator) {
   EXPECT_EQ(d2_.back(), 4);
 }
 TEST(ComplexityTest, ComplexityTest) {
-  const int samples_min = 3, samples_max = 8;
   std::vector<double> stumps;
   const double error = 0.1;
-  for (int i = samples_min; i <= samples_max; ++i) {
-    const int cur_size = static_cast<int>(pow(10, i));
+  for (int i = DequeTest::samples_min; i <= DequeTest::samples_max; ++i) {
+    const int cur_size = static_cast<int>(std::pow(10, i));
     mydeque::Deque<int> deq;
     std::vector<DequeTest::OperationData> ops;
     DequeTest::generate_ops(cur_size, 0, ops);
