@@ -75,6 +75,11 @@ public:
     }
     return;
   }
+  void deque_eq() {
+    EXPECT_TRUE(d_rand.size() == d_std.size() &&
+                std::equal(d_rand.begin(), d_rand.end(), d_std.begin()));
+    return;
+  }
 };
 TEST_F(DequeTest, DefaultConstructor) {
   EXPECT_EQ(0u, d0_.size());
@@ -99,12 +104,10 @@ TEST_F(DequeTest, MAIN_FUNCTIONALITY) {
   DequeTest::generate_ops(DequeTest::test_max, DequeTest::test_max, ops);
   DequeTest::process_ops(d_rand, ops);
   DequeTest::process_ops(d_std, ops);
-  EXPECT_TRUE(d_rand.size() == d_std.size() &&
-              std::equal(d_rand.begin(), d_rand.end(), d_std.begin()));
+  deque_eq();
   std::sort(d_rand.begin(), d_rand.end());
   std::sort(d_std.begin(), d_std.end());
-  EXPECT_TRUE(d_rand.size() == d_std.size() &&
-              std::equal(d_rand.begin(), d_rand.end(), d_std.begin()));
+  deque_eq();
 }
 TEST_F(DequeTest, Iterator) {
   EXPECT_TRUE(d0_.begin() == d0_.end());
