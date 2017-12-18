@@ -52,10 +52,9 @@ public:
     typedef _Deque_iterator _Self;
     _Ptr start_;
     size_t cur_;
-    explicit _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
+    _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
         : start_(start_), cur_(cur_) {}
-    explicit _Deque_iterator(const _Self &copy)
-        : start_(copy.start_), cur_(copy.cur_) {}
+    _Deque_iterator(const _Self &copy) : start_(copy.start_), cur_(copy.cur_) {}
     const _Self &operator=(const _Self &a) {
       cur_ = a.cur_;
       start_ = a.start_;
@@ -150,7 +149,7 @@ public:
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef Deque _Self;
-  explicit Deque(size_t capacity = 10) : capacity_(capacity) {
+  Deque(size_t capacity = 10) : capacity_(capacity) {
     tail_ = head_ = 0;
     array_ = new T[capacity_];
   }
@@ -163,21 +162,20 @@ public:
       return tail_ - head_;
   }
   bool empty() const { return tail_ == head_; }
-  explicit Deque(const Deque &copy)
+  Deque(const Deque &copy)
       : capacity_(copy.capacity_), array_(new T[capacity_]), head_(copy.head_),
         tail_(copy.tail_) {
     for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
       array_[i] = copy.array_[i];
   }
   template <typename InputIterator>
-  explicit Deque(InputIterator begin, InputIterator end)
+  Deque(InputIterator begin, InputIterator end)
       : capacity_(INC_COEF * std::distance(begin, end)), head_(0),
         tail_(std::distance(begin, end)) {
     array_ = new T[capacity_];
     std::copy(begin, end, array_);
   }
-  explicit Deque(Deque &&mv)
-      : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
+  Deque(Deque &&mv) : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
     mv.array_ = nullptr;
     mv.head_ = mv.tail_ = 0;
   }
@@ -185,6 +183,8 @@ public:
     head_ = cp.head_;
     tail_ = cp.tail_;
     capacity_ = cp.capacity_;
+    if (array_ == cp.array_)
+      return;
     delete[] array_;
     array_ = new T[capacity_];
     for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
