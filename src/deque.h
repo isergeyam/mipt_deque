@@ -8,8 +8,9 @@ private:
   T *array_;
   size_t head_;
   size_t tail_;
-  size_t fix_alloc(bool incr) {
-    T *res = (incr) ? new T[capacity_ << 1] : new T[capacity_ >> 1];
+  void fix_alloc(bool incr) {
+    size_t new_capacity = (incr) ? capacity_ << 1 : capacity_ >> 1;
+    T *res = new T[new_capacity];
     size_t size_ = (incr) ? capacity_ - 1 : size();
     for (size_t i = 0; i < size_; ++i) {
       res[i] = array_[head_];
@@ -18,16 +19,16 @@ private:
     delete[] array_;
     array_ = res;
     head_ = 0;
-    return size_;
+    tail_ = size_;
+    capacity_ = new_capacity;
+    return;
   }
   void increase() {
-    tail_ = fix_alloc(true);
-    capacity_ <<= 1;
+    fix_alloc(true);
     return;
   }
   void decrease() {
-    tail_ = fix_alloc(false);
-    capacity_ >>= 1;
+    fix_alloc(false);
     return;
   }
   void fix_size() {
@@ -184,6 +185,7 @@ public:
     head_ = cp.head_;
     tail_ = cp.tail_;
     capacity_ = cp.capacity_;
+    array_ = new T[capacity_];
     for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
       array_[i] = cp.array_[i];
     return *this;
