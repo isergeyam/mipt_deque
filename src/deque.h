@@ -185,6 +185,7 @@ public:
     head_ = cp.head_;
     tail_ = cp.tail_;
     capacity_ = cp.capacity_;
+    delete[] array_;
     array_ = new T[capacity_];
     for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
       array_[i] = cp.array_[i];
