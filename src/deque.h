@@ -1,7 +1,5 @@
 #include <iterator>
 
-namespace mydeque {
-
 template <class T, int INC_COEF = 2, int DEC_COEF = 4>
 
 class Deque {
@@ -10,22 +8,9 @@ private:
   T *array_;
   size_t head_;
   size_t tail_;
-  void increase() {
-    T *res = new T[capacity_ << 1];
-    for (size_t i = 0; i < capacity_ - 1; ++i) {
-      res[i] = array_[head_];
-      head_ = (head_ + 1) % capacity_;
-    }
-    delete[] array_;
-    array_ = res;
-    head_ = 0;
-    tail_ = capacity_ - 1;
-    capacity_ <<= 1;
-    return;
-  }
-  void decrease() {
-    T *res = new T[capacity_ >> 1];
-    size_t size_ = size();
+  size_t fix_alloc(bool incr) {
+    T *res = (incr) ? new T[capacity_ << 1] : new T[capacity_ >> 1];
+    size_t size_ = (incr) ? capacity_ - 1 : size();
     for (size_t i = 0; i < size_; ++i) {
       res[i] = array_[head_];
       head_ = (head_ + 1) % capacity_;
@@ -33,8 +18,23 @@ private:
     delete[] array_;
     array_ = res;
     head_ = 0;
-    tail_ = size_;
+    return size_;
+  }
+  void increase() {
+    tail_ = fix_alloc(true);
+    capacity_ <<= 1;
+    return;
+  }
+  void decrease() {
+    tail_ = fix_alloc(false);
     capacity_ >>= 1;
+    return;
+  }
+  void fix_size() {
+    if (head_ == (tail_ + 1) % capacity_)
+      increase();
+    if (size() < capacity_ / DEC_COEF)
+      decrease();
     return;
   }
 
@@ -51,9 +51,10 @@ public:
     typedef _Deque_iterator _Self;
     _Ptr start_;
     size_t cur_;
-    _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
+    explicit _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
         : start_(start_), cur_(cur_) {}
-    _Deque_iterator(const _Self &copy) : start_(copy.start_), cur_(copy.cur_) {}
+    explicit _Deque_iterator(const _Self &copy)
+        : start_(copy.start_), cur_(copy.cur_) {}
     const _Self &operator=(const _Self &a) {
       cur_ = a.cur_;
       start_ = a.start_;
@@ -148,7 +149,7 @@ public:
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef Deque _Self;
-  Deque(size_t capacity = 10) : capacity_(capacity) {
+  explicit Deque(size_t capacity = 10) : capacity_(capacity) {
     tail_ = head_ = 0;
     array_ = new T[capacity_];
   }
@@ -161,20 +162,21 @@ public:
       return tail_ - head_;
   }
   bool empty() const { return tail_ == head_; }
-  Deque(const Deque &copy)
-      : capacity_(copy.capacity_), head_(copy.head_), tail_(copy.tail_),
-        array_(new T[capacity_]) {
+  explicit Deque(const Deque &copy)
+      : capacity_(copy.capacity_), array_(new T[capacity_]), head_(copy.head_),
+        tail_(copy.tail_) {
     for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
       array_[i] = copy.array_[i];
   }
   template <typename InputIterator>
-  Deque(InputIterator begin, InputIterator end)
+  explicit Deque(InputIterator begin, InputIterator end)
       : capacity_(INC_COEF * std::distance(begin, end)), head_(0),
         tail_(std::distance(begin, end)) {
     array_ = new T[capacity_];
     std::copy(begin, end, array_);
   }
-  Deque(Deque &&mv) : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
+  explicit Deque(Deque &&mv)
+      : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
     mv.array_ = nullptr;
     mv.head_ = mv.tail_ = 0;
   }
@@ -202,13 +204,6 @@ public:
   const T &back() const { return *crbegin(); }
   T &front() { return *begin(); }
   const T &front() const { return *cbegin(); }
-  void fix_size() {
-    if (head_ == (tail_ + 1) % capacity_)
-      increase();
-    if (size() < capacity_ / DEC_COEF)
-      decrease();
-    return;
-  }
   void push_back(const T &x) {
     fix_size();
     array_[tail_] = x;
@@ -264,5 +259,4 @@ public:
   const_reverse_iterator crend() const {
     return const_reverse_iterator(cbegin());
   }
-};
 };

@@ -7,7 +7,7 @@
 namespace {
 class DequeTest : public testing::Test {
 protected:
-  mydeque::Deque<int> d0_, d1_, d2_, d3_, d_rand;
+  Deque<int> d0_, d1_, d2_, d3_, d_rand;
   std::deque<int> d_std;
   std::vector<int> array;
   static size_t test_max;
@@ -30,7 +30,7 @@ protected:
     array = std::vector<int>(test_max);
     std::srand(std::time(NULL));
     std::generate(array.begin(), array.end(), std::rand);
-    d_rand = mydeque::Deque<int>(array.begin(), array.end());
+    d_rand = Deque<int>(array.begin(), array.end());
     d_std = std::deque<int>(array.begin(), array.end());
   }
 
@@ -149,7 +149,7 @@ TEST(ComplexityTest, ComplexityTest) {
   const double error = 0.1;
   for (int i = DequeTest::samples_min; i <= DequeTest::samples_max; ++i) {
     const int cur_size = static_cast<int>(std::pow(10, i));
-    mydeque::Deque<int> deq;
+    Deque<int> deq;
     std::vector<DequeTest::OperationData> ops;
     DequeTest::generate_ops(cur_size, 0, ops);
     const clock_t start_time = std::clock();
