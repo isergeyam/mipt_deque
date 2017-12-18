@@ -182,15 +182,14 @@ public:
     mv.head_ = mv.tail_ = 0;
   }
   _Self &operator=(const _Self &cp) {
+    if (array_ == cp.array_)
+      return;
     head_ = cp.head_;
     tail_ = cp.tail_;
     capacity_ = cp.capacity_;
-    if (array_ == cp.array_)
-      return;
     delete[] array_;
     array_ = new T[capacity_];
-    for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
-      array_[i] = cp.array_[i];
+    std::copy(begin(), end(), cp.begin());
     return *this;
   }
   T &operator[](size_t num) {
