@@ -154,7 +154,7 @@ TEST(ComplexityTest, ComplexityTest) {
     stumps.push_back(static_cast<double>(std::clock() - start_time) /
                      static_cast<double>(cur_size));
   }
-  for (size_t i = 0; i < stumps.size() - 1; ++i) {
+  for (size_t i = 0; i + 1 < stumps.size(); ++i) {
     for (size_t j = i + 1; j < stumps.size(); ++j) {
       EXPECT_NEAR(stumps[i], stumps[j], error);
     }
