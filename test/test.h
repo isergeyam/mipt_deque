@@ -11,11 +11,8 @@ protected:
   std::deque<int> d_std;
   std::vector<int> array;
   static size_t test_max;
+  enum OperationType { PU_BACK, PU_FRONT, PO_BACK, PO_FRONT };
 
-  static const int PU_BACK = 0;
-  static const int PU_FRONT = 1;
-  static const int PO_BACK = 2;
-  static const int PO_FRONT = 3;
   DequeTest() {
     d1_.push_back(1);
     d2_.push_back(2);
@@ -45,9 +42,9 @@ public:
     samples_max = std::atoi(argv[3]);
   }
   struct OperationData {
-    int type;
+    OperationType type;
     int data;
-    OperationData(int type, int data) : type(type), data(data) {}
+    OperationData(OperationType type, int data) : type(type), data(data) {}
   };
   template <typename Deque>
   static void process_ops(Deque &deq, const std::vector<OperationData> &ops) {
@@ -72,7 +69,7 @@ public:
   static void generate_ops(size_t sz, size_t cur_sz,
                            std::vector<OperationData> &ops) {
     while (sz) {
-      OperationData cur(std::rand() % 4, std::rand());
+      OperationData cur(OperationType(std::rand() % 4), std::rand());
       if (cur.type > 2) {
         if (!cur_sz)
           continue;

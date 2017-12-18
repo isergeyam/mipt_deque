@@ -1,5 +1,8 @@
 #include <iterator>
 
+inline size_t mod(int x, int mod) {
+  return (x < mod) ? (x < 0) ? mod + x : x : x - mod;
+}
 template <class T, int INC_COEF = 2, int DEC_COEF = 4>
 
 class Deque {
@@ -14,7 +17,7 @@ private:
     size_t size_ = (incr) ? capacity_ - 1 : size();
     for (size_t i = 0; i < size_; ++i) {
       res[i] = array_[head_];
-      head_ = (head_ + 1) % capacity_;
+      head_ = mod((head_ + 1), capacity_);
     }
     delete[] array_;
     array_ = res;
@@ -32,7 +35,7 @@ private:
     return;
   }
   void fix_size() {
-    if (head_ == (tail_ + 1) % capacity_)
+    if (head_ == mod((tail_ + 1), capacity_))
       increase();
     if (size() < capacity_ / DEC_COEF)
       decrease();
@@ -52,10 +55,9 @@ public:
     typedef _Deque_iterator _Self;
     _Ptr start_;
     size_t cur_;
-    explicit _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
+    _Deque_iterator(_Ptr start_ = nullptr, size_t cur_ = 0)
         : start_(start_), cur_(cur_) {}
-    explicit _Deque_iterator(const _Self &copy)
-        : start_(copy.start_), cur_(copy.cur_) {}
+    _Deque_iterator(const _Self &copy) : start_(copy.start_), cur_(copy.cur_) {}
     const _Self &operator=(const _Self &a) {
       cur_ = a.cur_;
       start_ = a.start_;
@@ -71,7 +73,7 @@ public:
     bool operator!=(const _Self &a) { return !(cur_ == a.cur_); }
     reference operator*() { return start_->array_[cur_]; }
     _Self &operator++() {
-      cur_ = (cur_ + 1) % start_->capacity_;
+      cur_ = mod((cur_ + 1), start_->capacity_);
       return *this;
     }
     _Self operator++(int) {
@@ -80,7 +82,7 @@ public:
       return ans;
     }
     _Self &operator--() {
-      cur_ = (cur_ + start_->capacity_ - 1) % start_->capacity_;
+      cur_ = mod((cur_ - 1), start_->capacity_);
       return *this;
     }
     _Self operator--(int) {
@@ -103,13 +105,13 @@ public:
           cur_ += rhs;
           return *this;
         } else
-          cur_ = (rhs + cur_) % start_->capacity_;
+          cur_ = mod((rhs + cur_), start_->capacity_);
       } else {
         if (start_->head_ < start_->tail_ || cur_ > start_->tail_) {
           cur_ += rhs;
           return *this;
         } else
-          cur_ = (cur_ + rhs + start_->capacity_) % start_->capacity_;
+          cur_ = mod((cur_ + rhs), start_->capacity_);
       }
       return *this;
     }
@@ -150,7 +152,7 @@ public:
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef Deque _Self;
-  explicit Deque(size_t capacity = 10) : capacity_(capacity) {
+  Deque(size_t capacity = 10) : capacity_(capacity) {
     tail_ = head_ = 0;
     array_ = new T[capacity_];
   }
@@ -163,21 +165,20 @@ public:
       return tail_ - head_;
   }
   bool empty() const { return tail_ == head_; }
-  explicit Deque(const Deque &copy)
+  Deque(const Deque &copy)
       : capacity_(copy.capacity_), array_(new T[capacity_]), head_(copy.head_),
         tail_(copy.tail_) {
-    for (size_t i = head_; i != tail_; i = (i + 1) % capacity_)
+    for (size_t i = head_; i != tail_; i = mod((i + 1), capacity_))
       array_[i] = copy.array_[i];
   }
   template <typename InputIterator>
-  explicit Deque(InputIterator begin, InputIterator end)
+  Deque(InputIterator begin, InputIterator end)
       : capacity_(INC_COEF * std::distance(begin, end)), head_(0),
         tail_(std::distance(begin, end)) {
     array_ = new T[capacity_];
     std::copy(begin, end, array_);
   }
-  explicit Deque(Deque &&mv)
-      : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
+  Deque(Deque &&mv) : array_(mv.array_), head_(mv.head_), tail_(mv.tail_) {
     mv.array_ = nullptr;
     mv.head_ = mv.tail_ = 0;
   }
@@ -211,12 +212,12 @@ public:
   void push_back(const T &x) {
     fix_size();
     array_[tail_] = x;
-    tail_ = (tail_ + 1) % capacity_;
+    tail_ = mod((tail_ + 1), capacity_);
     return;
   }
   void push_front(const T &x) {
     fix_size();
-    head_ = (head_ - 1 + capacity_) % capacity_;
+    head_ = mod((head_ - 1), capacity_);
     array_[head_] = x;
     return;
   }
@@ -224,14 +225,14 @@ public:
     fix_size();
     if (empty())
       return;
-    tail_ = (tail_ - 1 + capacity_) % capacity_;
+    tail_ = mod((tail_ - 1), capacity_);
     return;
   }
   void pop_front() {
     fix_size();
     if (empty())
       return;
-    head_ = (head_ + 1) % capacity_;
+    head_ = mod((head_ + 1), capacity_);
     return;
   }
   _Self &operator=(_Self &&mv) {
